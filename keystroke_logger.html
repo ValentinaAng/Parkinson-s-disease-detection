@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Keystroke Logging</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Keystroke Logging</h2>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+    <br><br>
+    <textarea id="textArea" onkeydown="logKey(event)" onkeyup="logKeyUp(event)"></textarea>
+    <table>
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Hand</th>
+                <th>Direction</th>
+                <th>Hold Time (ms)</th>
+                <th>Latency Time (ms)</th>
+            </tr>
+        </thead>
+        <tbody id="logTable"></tbody>
+    </table>
+    <button onclick="saveData()">Save Data</button>
+
+    <script>
+        const handMap = {
+            'q': 'L', 'w': 'L', 'e': 'L', 'r': 'L', 't': 'L', 'a': 'L', 's': 'L', 'd': 'L', 'f': 'L', 'g': 'L', 'z': 'L', 'x': 'L', 'c': 'L', 'v': 'L', 'b': 'L',
+            'y': 'R', 'u': 'R', 'i': 'R', 'o': 'R', 'p': 'R', 'h': 'R', 'j': 'R', 'k': 'R', 'l': 'R', 'n': 'R', 'm': 'R', ' ': 'S'
+        };
+        let keyLog = {};
+        let logEntries = [];
+        let lastKey = null;
+        let lastKeyTime = null;
+
+        function logKey(event) {
+            const key = event.key.toLowerCase();
+            if (!keyLog[key]) {
+                keyLog[key] = { start: event.timeStamp };
+            }
+        }
+
+        function logKeyUp(event) {
+            const key = event.key.toLowerCase();
+            if (!keyLog[key]) return; // Skip if the key wasn't logged on keydown
+
+            const hand = handMap[key] || 'Unknown';
+            const startTime = keyLog[key].start;
+            const endTime = event.timeStamp;
+            const holdTime = endTime - startTime;
+            let direction = 'N/A';
+            let latencyTime = 'N/A';
+
+            if (lastKey !== null) {
+                let lastKeyHand = handMap[lastKey] || 'Unknown';
+                direction = lastKeyHand + hand;
+
+                if (lastKey === ' ') {
+                    if (hand === 'L') {
+                        direction = 'SL';
+                    } else if (hand === 'R') {
+                        direction = 'SR';
+                    }
+                } else if (key === ' ') {
+                    if (lastKeyHand === 'L') {
+                        direction = 'LS';
+                    } else if (lastKeyHand === 'R') {
+                        direction = 'RS';
+                    }
+                }
+
+                latencyTime = startTime - lastKeyTime;
+            }
+
+            const table = document.getElementById('logTable');
+            const row = table.insertRow();
+            row.insertCell(0).innerText = key;
+            row.insertCell(1).innerText = hand;
+            row.insertCell(2).innerText = direction;
+            row.insertCell(3).innerText = holdTime.toFixed(2);
+            row.insertCell(4).innerText = latencyTime === 'N/A' ? 'N/A' : latencyTime.toFixed(2);
+
+            logEntries.push({
+                key: key,
+                hand: hand,
+                direction: direction,
+                holdTime: holdTime.toFixed(2),
+                latencyTime: latencyTime === 'N/A' ? 'N/A' : latencyTime.toFixed(2)
+            });
+
+            lastKey = key;
+            lastKeyTime = endTime;
+            delete keyLog[key];
+        }
+
+        function saveData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logEntries, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "keystroke_log.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Ensure backspace key works for deleting text in the textarea
+        document.getElementById('textArea').addEventListener('keydown', function(event) {
+            if (event.key === 'Backspace') {
+                logKey(event);
+            }
+        });
+
+        document.getElementById('textArea').addEventListener('keyup', function(event) {
+            if (event.key === 'Backspace') {
+                logKeyUp(event);
+            }
+        });
+    </script>
+</body>
+</html>
