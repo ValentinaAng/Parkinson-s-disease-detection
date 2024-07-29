@@ -18,12 +18,13 @@ This is my final project from the Data Science Academy at Brainster, where I col
 
 ![best](https://github.com/user-attachments/assets/8b2fa7aa-93ab-4589-8a7b-9756eafa7bc9)
 
-+---------------+-------------+--------------+----------+-----------+-------------+--------------+---------+-----------+
-| Model         |      Train  |       Train  |   Train  |    Train  |       Test  |        Test  |   Test  |     Test  |
-|               |    Accuracy |    Precision |       F1 |    Recall |    Accuracy |    Precision |      F1 |    Recall |
-+===============+=============+==============+==========+===========+=============+==============+=========+===========+
-| XGBoost       |     0.90113 |      0.9011  |  0.90111 |   0.90113 |     0.89904 |      0.89902 | 0.89903 |   0.89904 |
-+---------------+-------------+--------------+----------+-----------+-------------+--------------+---------+-----------+
+
+| Model   | Train Accuracy | Train Precision | Train F1 | Train Recall | Test Accuracy | Test Precision | Test F1 | Test Recall |
+|---------|----------------|-----------------|----------|--------------|---------------|----------------|---------|-------------|
+| XGBoost | 0.90113        | 0.9011          | 0.90111  | 0.90113      | 0.89904       | 0.89902        | 0.89903 | 0.89904     |
+
+
+
 
 # Conclusion
 
